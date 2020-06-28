@@ -1,0 +1,299 @@
+---
+title: "Examen #2 Estadística"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    highlight: kate
+---
+
+
+
+# Portada 
+
+
+## Instituto Tecnológico de Costa Rica
+
+
+## Campus Tecnológico Local San Carlos
+
+
+## Escuela de Ciencias Naturales y Exactas
+
+
+## Estadística
+
+
+## Exámen #2 
+
+
+## Jesús Gabriel Araya López
+## Kevin Solano Jiménez
+## Randald Villegas Brenes
+
+
+## I Semestre, 2020
+
+
+
+
+
+
+# Indicaciones generales
+
+## **Para cada situación, debe indicar los siguiente:**
+
+### **->**Los grador de libertad, si corresponde.
+
+### **->**Valor P
+
+### **->**Valor observado, en los casos que corresponda
+
+### **->**Interprete el intervalo de confianza en los casos que corresponda
+
+### **->**Otros aspectos específicos que se pedirán en cada caso
+
+
+# Caso #3
+
+### Utilice la base de datos KidsFeet paquete mosaicData como evidencia para afirmar que el pormedios de la longitud del pie (length) de los niños (B: boys) es igual que el de las niñas (G: girls). Para emitir su conclusión, siga el siguiente proceso:
+
+```{r setup, echo=TRUE, warning=FALSE, results='hide',message=FALSE}
+
+library(dplyr)
+
+library(mosaicData)
+
+library(car)
+
+library(nortest)
+
+
+
+```
+
+### Para cada datset (niños y niñas), haga un estudio gráfico de la normalidad. Para esto elabore el gráfico que contenga tanto la función de densidad para cada caso como su respectiva curva normal teórica a partir de su media y desviación estándar. ¿Se puede intuir una posible normalidad para los datos?. explique brevemente.
+
+### Para cada dataset (niños y niñas) elabore un gráfico QQ-plot y haga la interpretación en cada caso, desde el punto de vista si es posible asumir normalidad.
+
+### Realice las pruebas formales de normalidad S-W test, A-D test,K-S-L test e interprete los resultados. ¿Se puede concluir normalidad en todos ellos?
+
+## **Datos de Hombres**
+
+```{r}
+# Dataset de los hombres
+Boys_DB <- KidsFeet %>%
+  filter(sex == 'B')
+
+# Variable que contiene el largo de todos los pies de los hombres 
+piesB <- Boys_DB$length
+
+# Estimación de densidad Hombres
+plot(density(piesB), main = "Estimación de la densidad para los pies de los hombres")
+
+# Se generan valores para estimar la normal
+x <- seq(from = 1,to = 30, by = 0.01)
+
+# Media 
+u <- mean(Boys_DB$length)
+
+# Desviación Estandar
+sigma <- sd(Boys_DB$length)
+
+# Se genera la estimación de la normal
+# Si se puede asumir una posible normalidad debido a que con una muestra de tamano 20, la grafica muestra mucha similitud a una distribuccion normal.
+lines(x, dnorm(x, mean = u, sd = sigma), col = "red")
+
+# Gráfico QQ-Plot Hombres
+# Tanto el el gráfico QQ-Plot del dataset de hombre como de las mujeres, podemos encontrar una distribución normal, es decir que si se puede asumir normalidad, la distribución es de  tipo "Light Tail", este tipo de distribución se caracteriza por tener forma de campana no ancha, es decir, no presenta mucha variedad de datos
+qqPlot(x, distribution="norm", id=FALSE)
+
+
+# AD Test Hombres
+# si se puede asumir normalidad, debido a su valor P
+ad.test(piesB)
+
+
+# Shapiro Test Hombres
+# si se puede asumir normalidad, debido a que el valor es mayor a 0.05
+shapiro.test(piesB)
+
+# K-S-L test Hombres
+# debido a que el valor es mayor a 0.05, si se puede asumir normalidad
+lillie.test(piesB)
+
+```
+
+## **Datos de las mujeres**
+```{r}
+# Dataset de las mujeres
+Girls_DB <- KidsFeet %>%
+  filter(sex == 'G')
+
+# Variable que contiene el largo de todos los pies de las mujeres
+piesG <- Girls_DB$length
+
+# Estimación de densidad
+plot(density(piesG), main = "Estimación de la densidad para los pies de las mujeres")
+
+# Se generan valores para estimar la normal
+x <- seq(from = 1,to = 30, by = 0.01)
+
+# Media 
+u <- mean(Girls_DB$length)
+
+# Desviación Estandar
+sigma <- sd(Girls_DB$length)
+
+# Se genera la estimación de la normal
+# Si se puede asumir una posible normalidad debido a que con una muestra de tamano 19, la grafica muestra mucha similitud a una distribuccion normal.
+lines(x, dnorm(x, mean = u, sd = sigma), col = "red")
+
+# gráfico QQ-plot Mujeres
+# Tanto el el gráfico QQ-Plot del dataset de hombre como de las mujeres, podemos encontrar una distribución normal, es decir que si se puede asumir normalidad, la distribución es de  tipo "Light Tail", este tipo de distribución se caracteriza por tener forma de campana no ancha, es decir, no presenta mucha variedad de datos
+qqPlot(x, distribution="norm")
+
+#AD Test Mujeres
+# si se puede asumir normalidad, debido a su valor P
+ad.test(piesG)
+
+# Shapiro Test Mujeres
+# si se puede asumir normalidad, debido a que el valor es mayor a 0.05
+shapiro.test(piesG)
+
+# K-S-L test Mujeres
+# debido a que el valor es mayor a 0.05, si se puede asumir normalidad
+lillie.test(piesG)
+
+
+
+```
+
+
+
+## D’Agostino-Pearson Hombres
+
+### ¿Es posible aplicar D’Agostino-Pearson?. Pruebe y de su interpretación de lo ocurrido.
+
+```{r, echo=TRUE, warning=FALSE, results='hide',message=FALSE}
+library(fBasics)
+
+# D’Agostino-Pearson Hombres
+dagoTest(piesB)
+
+# D’Agostino-Pearson Mujeres
+#dagoTest(piesG)
+
+# Para poder aplicar dicho test en la mujeres,se debe cumplir que el tamaño de la muestra debe ser 20 como mínimo, el cual no se cumple en este caso.
+```
+
+
+### ¿Se puede considerar que ambas poblaciones tienen varianzas iguales o no?. Realice la prueba que corresponda para justificar su respuesta, apoyado en lo que se imprima en R. Además, describa los otros elementos que aparecen en la impresión de la prueba.
+
+
+```{r}
+# Se ejecuta una prueba de varianzas para saber si son iguales o no
+# El resultado de la prueba dice que el valor p es de 0.7, como se asume alga de 0.5, por valor P se establece que las varianzas son iguales, y además en el IC está incluido el 1
+var.test(piesB, piesG)
+
+```
+
+
+### Realice una prueba de hipótesis para la diferencia de promedios de longitud del pie de niños con respecto a las niñas. Considere los resultados de las pruebas ya realizadas, para seleccionar el tipo de prueba apropiada para este caso. Justifique el porqué eligió la prueba y haga una interpretación de la misma, a partir de P-Valor, el IC, estimadores de las medias, grados de libertad (si corresponde).
+
+### Responda la pregunta planteada en el caso.
+
+```{r}
+# Se realiza la prueba T-Student para la diferencia de promedios, como se asumió varianzas iguales, el valor 'var.equal' es True, ademas se pudo observar que el valor P se encuentra dentro del IC. 
+t.test(piesB, piesG, alternative = "two.sided", var.equal = TRUE)
+```
+
+
+# Caso #4
+
+
+### La siguiente tabla resume los datos de obtenidos de víctimas de crímenes elegidas al azar (según datos del Departamento de Justicia de USA):
+
+
+### HOMICIDIO	ROBO	ASALTO
+### El criminal era un extraño	12	379	727
+### El criminal era un conocido o pariente	39	106	642
+
+```{r}
+#Matriz
+chisq.test(matrix(c(12, 379, 727, 39, 106, 642),2,3))
+
+```
+
+
+### Con los datos anteriores, ¿sería posible considerarque el tipo de delito es independiente la condición del delincuente?, o por el contrario, ¿existe alguna relación entre el tipo de delito con respecto al quien comete el acto? Use un nivel de significancia de 5%.
+
+**Por lo que no se puede aceptar independencia de la condición del delincuente, ya que el valor P es menor que alfa que es igual a 0.05**
+
+
+### Además, identifique el valor del χ2obs,los grados de libertad y la relación de estos con los datos del problema.
+
+**El valor del χ2obs = 1339.3**
+
+**Los grados de libertad son = 2**
+
+# Caso #5
+
+
+### La seguridad de los automóviles se determina mediante diversas pruebas. Una de ellas consiste en hacer chocar un automóvil contra una barrera fija a 35 mi/h con un maniquí colocado en el asiento del conductor. Una de las medidas utilizadas para cuantificar el impacto del choque sobre el conductor, se le conoce como Desaceleración de pecho y se mide en unidades de fuerza de gravedad (g). Los valores más grandes indican mayores cantidades de desaceleración, las cuáles pueden provocar lesiones graves en los conductores. La siguiente tabla muestra mediciones de desaceleraciones de pecho obtenidas a partir de pruebas de choques de diferentes tipos de vehículos:
+
+```{r}
+datos <- read.csv("datos.csv", sep = ";")
+head(datos, 10)
+
+
+summary(aov(desaceleracion~tipo, data = datos))
+
+
+
+```
+
+
+### Con los datos anteriores, ¿es posible considerar que el tamaño del automóvil puede variar en cuanto a la seguridad de sus pasajeros o por el contrario, es igualmente riesgoso?. Use un nivel de significancia del 5%.
+
+**Como el valor P es menor que alfa = 0.05, entonces se rechaza la hipotesis nula, la cual es que los autos son igualmente seguros**
+
+### Además, Con los datos que imprime la prueba, indique los siguiente:
+#### Los valores de SSE, SSA y SST 
+
+**SSA = 158.5**
+**SSE = 535.6**
+**SST = 694.1**
+
+### Explique la realación de la columna Mean Sq con los valores vistos en clases correspondientes a s21 y s22
+
+**Mean Sq, se obtiene dividiendo la suma de cuadrados por los grados de libertad. **
+**Mean Sq representa la variación entre las medias muestrales. **
+**s21 = Varianza inter-tratamiento muestral. **
+**s22 = Varianza intra-tratamiento muestral. **
+**La division entre S21 y S22, tienen la misma funcion de Mean Sq, la cual es verificar si alguna de las 3 medidas se diferencia mas que las otras. **
+**En otras palabras si el valor es pequeño se puede asumir que las 3 medias muestrales son iguales y no hubo un efecto diferenciador en almenos uno de ellos. **
+
+
+### Valor de fobs y cómo este se puede calcular a partir de los otros datos
+
+**fobs Se calcula con la siguiente Formula = [(N-K)/(K-1)]*(SSA/SSE)**
+
+**N = sumatoria de todos los carros**
+**K = Grados de libertad**
+**SSA = Suma de cuadrados de diferencias entre promedio**
+**SSE = Suma de variaciones de los datos**
+
+
+### Realice una prueba Tukey e interprete los resultados. ¿Cuáles parejas según el tipo de auto, evidencia diferencia de medias?. Justifique
+
+```{r}
+# Almacenamos la prueba de ANOVA en una nueva variable
+anova.dosis <- aov(desaceleracion~tipo, data = datos)
+
+#Pasamo la prueba ANOVa a la prueba Tuckey
+TukeyHSD(anova.dosis)
+
+
+```
+
+**Encontramos que no existen diferencias debido que ningun valor P generado por la prueba es menor a 0.001, podemos concluir que no existen diferencias de medias significativas entre los grupos.**
